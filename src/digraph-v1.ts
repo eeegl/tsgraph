@@ -4,7 +4,7 @@ import type { DiGraph } from "./digraph-interface.js";
 import { newIsoUtc, type IsoDatetimeUtcExtendedMs } from "@eeegl/tstime";
 import { _err, _ok } from "./shared.js";
 
-export const creatGraphV1 = <N, E = string>(): DiGraph<N, E> =>
+export const createGraphV1 = <N, E = string>(): DiGraph<N, E> =>
   new DiGraphV1<N, E>();
 
 class DiGraphV1<N, E> implements DiGraph<N, E> {

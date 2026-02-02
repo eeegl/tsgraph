@@ -11,9 +11,9 @@ npm install @eeegl/tsgraph
 ## Quick Start
 
 ```typescript
-import { creatGraphV1, newNode, newEdge } from "@eeegl/tsgraph";
+import { createGraphV1, newNode, newEdge } from "@eeegl/tsgraph";
 
-const graph = creatGraphV1<string, string>();
+const graph = createGraphV1<string, string>();
 
 const nodeA = newNode("A");
 const nodeB = newNode("B");
@@ -39,7 +39,7 @@ console.log(g.edgeCount()); // 1
 
 ### Creating a Graph
 
-#### `creatGraphV1<N, E>()`
+#### `createGraphV1<N, E>()`
 
 Creates a new empty directed graph.
 
@@ -51,7 +51,7 @@ Creates a new empty directed graph.
 
 **Example:**
 ```typescript
-const graph = creatGraphV1<number, string>();
+const graph = createGraphV1<number, string>();
 ```
 
 ### Graph Properties
@@ -394,9 +394,9 @@ type Result<T, ErrT> =
 ### Building a Graph
 
 ```typescript
-import { creatGraphV1, newNode, newEdge } from "@eeegl/tsgraph";
+import { createGraphV1, newNode, newEdge } from "@eeegl/tsgraph";
 
-const graph = creatGraphV1<string, number>();
+const graph = createGraphV1<string, number>();
 
 const nodes = ["A", "B", "C"].map(v => newNode(v));
 let g = graph;
@@ -417,9 +417,9 @@ console.log(g.edgeCount()); // 2
 ### Filtering and Mapping
 
 ```typescript
-import { creatGraphV1, newNode } from "@eeegl/tsgraph";
+import { createGraphV1, newNode } from "@eeegl/tsgraph";
 
-const graph = creatGraphV1<number, string>();
+const graph = createGraphV1<number, string>();
 
 const g = graph
   .setNode(newNode(1))
@@ -438,9 +438,9 @@ console.log(result); // 60 (20 + 40)
 ### Error Handling
 
 ```typescript
-import { creatGraphV1, newNode, newEdge } from "@eeegl/tsgraph";
+import { createGraphV1, newNode, newEdge } from "@eeegl/tsgraph";
 
-const graph = creatGraphV1<string, string>();
+const graph = createGraphV1<string, string>();
 const node = newNode("A");
 const g = graph.setNode(node);
 
@@ -465,9 +465,9 @@ if (!result.ok) {
 ### JSON Round-Trip
 
 ```typescript
-import { creatGraphV1, newNode } from "@eeegl/tsgraph";
+import { createGraphV1, newNode } from "@eeegl/tsgraph";
 
-const graph = creatGraphV1<string, string>();
+const graph = createGraphV1<string, string>();
 
 const original = graph
   .setNode(newNode("A"))
