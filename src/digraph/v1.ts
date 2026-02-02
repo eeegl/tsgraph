@@ -182,4 +182,32 @@ class DiGraphV1<N, E> implements DiGraph<N, E> {
       edges: this.edges().map((n) => ({ ...n, value: fn(n.value) })),
     });
   }
+
+  reduceNodes<T>(
+    fn: (acc: T, current: Node<N>, index: number) => T,
+    start: T,
+  ): T {
+    return this.nodes().reduce(fn, start);
+  }
+
+  reduceEdges<T>(
+    fn: (acc: T, current: Edge<E>, index: number) => T,
+    start: T,
+  ): T {
+    return this.edges().reduce(fn, start);
+  }
+
+  reduceNodeValues<T>(
+    fn: (acc: T, current: N, index: number) => T,
+    start: T,
+  ): T {
+    return this.nodeValues().reduce(fn, start);
+  }
+
+  reduceEdgeValues<T>(
+    fn: (acc: T, current: E, index: number) => T,
+    start: T,
+  ): T {
+    return this.edgeValues().reduce(fn, start);
+  }
 }

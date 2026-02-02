@@ -34,22 +34,22 @@ export interface DiGraph<N, E> {
   mapNodeValues<T>(fn: (value: N) => T): DiGraph<T, E>;
   mapEdgeValues<T>(fn: (value: E) => T): DiGraph<N, T>;
 
-  // reduceNodes<T>(
-  //   fn: (acc: T, current: Node<N>, index: number) => T,
-  //   start: T,
-  // ): T;
-  // reduceEdges<T>(
-  //   fn: (acc: T, current: Edge<E>, index: number) => T,
-  //   start: T,
-  // ): T;
-  // reduceNodeValues<T>(
-  //   fn: (acc: T, current: N, index: number) => T,
-  //   start: T,
-  // ): T;
-  // reduceEdgeValues<T>(
-  //   fn: (acc: T, current: E, index: number) => T,
-  //   start: T,
-  // ): T;
+  reduceNodes<T>(
+    fn: (acc: T, current: Node<N>, index: number) => T,
+    start: T,
+  ): T;
+  reduceEdges<T>(
+    fn: (acc: T, current: Edge<E>, index: number) => T,
+    start: T,
+  ): T;
+  reduceNodeValues<T>(
+    fn: (acc: T, current: N, index: number) => T,
+    start: T,
+  ): T;
+  reduceEdgeValues<T>(
+    fn: (acc: T, current: E, index: number) => T,
+    start: T,
+  ): T;
 
   // addNode(node: Node<N>): DiGraph<N, E>;
   // getNode(id: string): Node<N> | undefined;
