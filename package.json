@@ -1,19 +1,20 @@
 {
   "name": "@eeegl/tsgraph",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "1.0.1",
+  "description": "A TypeScript library for immutable directed graphs with functional operations",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watch"
   },
-  "keywords": [],
+  "keywords": ["graph", "digraph", "directed-graph", "immutable", "typescript", "functional"],
   "author": "",
   "license": "MIT",
   "type": "module",
   "files": [
-    "src/"
+    "dist"
   ],
   "devDependencies": {
     "@jest/globals": "^30.2.0",
