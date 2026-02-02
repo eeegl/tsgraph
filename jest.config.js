@@ -20,6 +20,6 @@ export default {
     ],
   },
   transformIgnorePatterns: ["node_modules/(?!@eeegl)"],
-  testMatch: ["**/*.test.ts"],
+  testMatch: ["<rootDir>/tests/**/*.test.ts"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
 };

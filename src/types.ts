@@ -2,7 +2,6 @@ import type { IsoDatetimeUtcExtendedMs } from "@eeegl/tstime";
 
 export type Node<T> = {
   id: string;
-  url: "github.com/eeegl/tsgraph/node";
   type: "node";
   created: IsoDatetimeUtcExtendedMs;
   value: T;
@@ -12,7 +11,6 @@ export type Node<T> = {
 
 export type Edge<T> = {
   id: string;
-  url: "github.com/eeegl/tsgraph/edge";
   type: "edge";
   created: IsoDatetimeUtcExtendedMs;
   fromId: string;

@@ -1,5 +1,5 @@
 import type { IsoDatetimeUtcExtendedMs } from "@eeegl/tstime";
-import type { Edge, Node, Result } from "../types.js";
+import type { Edge, Node, Result } from "./types.js";
 
 export interface DiGraph<N, E> {
   id(): string;
@@ -16,9 +16,6 @@ export interface DiGraph<N, E> {
 
   nodeCount(shouldCount?: (node: Node<N>) => boolean): number;
   edgeCount(shouldCount?: (edge: Edge<E>) => boolean): number;
-
-  newNode(value: N): Node<N>;
-  newEdge(params: { fromId: string; toId: string; value: E }): Edge<E>;
 
   nodes(keep?: (node: Node<N>) => boolean): Node<N>[];
   edges(keep?: (edge: Edge<E>) => boolean): Edge<E>[];

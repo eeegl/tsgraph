@@ -1,5 +1,6 @@
 import { describe, test, expect } from "@jest/globals";
-import { creatGraphV1 } from "./v1.js";
+import { creatGraphV1 } from "../src/digraph-v1.js";
+import { newNode, newEdge } from "../src/shared.js";
 
 describe("DiGraphV1", () => {
   describe("basic operations", () => {
@@ -15,8 +16,8 @@ describe("DiGraphV1", () => {
 
     test("add nodes to graph", () => {
       const g = creatGraphV1<string, string>();
-      const node1 = g.newNode("test1");
-      const node2 = g.newNode("test2");
+      const node1 = newNode("test1");
+      const node2 = newNode("test2");
       const g2 = g.setNode(node1).setNode(node2);
 
       expect(g2.nodeCount()).toBe(2);
@@ -25,7 +26,7 @@ describe("DiGraphV1", () => {
 
     test("retrieve node by id", () => {
       const g = creatGraphV1<string, string>();
-      const node = g.newNode("test");
+      const node = newNode("test");
       const g2 = g.setNode(node);
       const retrieved = g2.getNode(node.id);
 
@@ -35,10 +36,10 @@ describe("DiGraphV1", () => {
 
     test("add edges between nodes", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("node1");
-      const n2 = g.newNode("node2");
+      const n1 = newNode("node1");
+      const n2 = newNode("node2");
       const g2 = g.setNode(n1).setNode(n2);
-      const edge = g2.newEdge({ fromId: n1.id, toId: n2.id, value: "edge1" });
+      const edge = newEdge({ fromId: n1.id, toId: n2.id, value: "edge1" });
       const g3 = g2.setEdge(edge);
 
       expect(g3.edgeCount()).toBe(1);
@@ -47,10 +48,10 @@ describe("DiGraphV1", () => {
 
     test("retrieve edge by id", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("from");
-      const n2 = g.newNode("to");
+      const n1 = newNode("from");
+      const n2 = newNode("to");
       const g2 = g.setNode(n1).setNode(n2);
-      const edge = g2.newEdge({ fromId: n1.id, toId: n2.id, value: "connect" });
+      const edge = newEdge({ fromId: n1.id, toId: n2.id, value: "connect" });
       const g3 = g2.setEdge(edge);
       const retrieved = g3.getEdge(edge.id);
 
@@ -62,7 +63,7 @@ describe("DiGraphV1", () => {
   describe("immutability", () => {
     test("setNode does not mutate original graph", () => {
       const g1 = creatGraphV1<string, string>();
-      const node = g1.newNode("test");
+      const node = newNode("test");
       const g2 = g1.setNode(node);
 
       expect(g1.nodeCount()).toBe(0);
@@ -72,10 +73,10 @@ describe("DiGraphV1", () => {
 
     test("setEdge does not mutate original graph", () => {
       const g1 = creatGraphV1<string, string>();
-      const n1 = g1.newNode("node1");
-      const n2 = g1.newNode("node2");
+      const n1 = newNode("node1");
+      const n2 = newNode("node2");
       const g2 = g1.setNode(n1).setNode(n2);
-      const edge = g2.newEdge({ fromId: n1.id, toId: n2.id, value: "edge" });
+      const edge = newEdge({ fromId: n1.id, toId: n2.id, value: "edge" });
       const g3 = g2.setEdge(edge);
 
       expect(g2.edgeCount()).toBe(0);
@@ -85,8 +86,8 @@ describe("DiGraphV1", () => {
 
     test("multiple operations create independent graphs", () => {
       const g1 = creatGraphV1<number, string>();
-      const n1 = g1.newNode(1);
-      const n2 = g1.newNode(2);
+      const n1 = newNode(1);
+      const n2 = newNode(2);
       const g2 = g1.setNode(n1);
       const g3 = g2.setNode(n2);
 
@@ -99,10 +100,10 @@ describe("DiGraphV1", () => {
   describe("edge relationships", () => {
     test("setEdge updates node edge lists", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("from");
-      const n2 = g.newNode("to");
+      const n1 = newNode("from");
+      const n2 = newNode("to");
       const g2 = g.setNode(n1).setNode(n2);
-      const edge = g2.newEdge({ fromId: n1.id, toId: n2.id, value: "connects" });
+      const edge = newEdge({ fromId: n1.id, toId: n2.id, value: "connects" });
       const g3 = g2.setEdge(edge);
 
       const fromNode = g3.getNode(n1.id);
@@ -118,13 +119,13 @@ describe("DiGraphV1", () => {
 
     test("node tracks multiple incoming edges", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
-      const n3 = g.newNode("C");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
+      const n3 = newNode("C");
       let graph = g.setNode(n1).setNode(n2).setNode(n3);
 
-      const e1 = graph.newEdge({ fromId: n1.id, toId: n3.id, value: "A->C" });
-      const e2 = graph.newEdge({ fromId: n2.id, toId: n3.id, value: "B->C" });
+      const e1 = newEdge({ fromId: n1.id, toId: n3.id, value: "A->C" });
+      const e2 = newEdge({ fromId: n2.id, toId: n3.id, value: "B->C" });
       graph = graph.setEdge(e1).setEdge(e2);
 
       const nodeC = graph.getNode(n3.id);
@@ -134,13 +135,13 @@ describe("DiGraphV1", () => {
 
     test("node tracks multiple outgoing edges", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
-      const n3 = g.newNode("C");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
+      const n3 = newNode("C");
       let graph = g.setNode(n1).setNode(n2).setNode(n3);
 
-      const e1 = graph.newEdge({ fromId: n1.id, toId: n2.id, value: "A->B" });
-      const e2 = graph.newEdge({ fromId: n1.id, toId: n3.id, value: "A->C" });
+      const e1 = newEdge({ fromId: n1.id, toId: n2.id, value: "A->B" });
+      const e2 = newEdge({ fromId: n1.id, toId: n3.id, value: "A->C" });
       graph = graph.setEdge(e1).setEdge(e2);
 
       const nodeA = graph.getNode(n1.id);
@@ -152,9 +153,9 @@ describe("DiGraphV1", () => {
   describe("error handling", () => {
     test("setEdge with invalid fromId returns error", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("valid");
+      const n1 = newNode("valid");
       const g2 = g.setNode(n1);
-      const edge = g2.newEdge({
+      const edge = newEdge({
         fromId: "nonexistent",
         toId: n1.id,
         value: "bad",
@@ -167,9 +168,9 @@ describe("DiGraphV1", () => {
 
     test("setEdge with invalid toId returns error", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("valid");
+      const n1 = newNode("valid");
       const g2 = g.setNode(n1);
-      const edge = g2.newEdge({
+      const edge = newEdge({
         fromId: n1.id,
         toId: "nonexistent",
         value: "bad",
@@ -182,7 +183,7 @@ describe("DiGraphV1", () => {
 
     test("setEdge with both invalid ids returns error", () => {
       const g = creatGraphV1<string, string>();
-      const edge = g.newEdge({
+      const edge = newEdge({
         fromId: "nonexistent1",
         toId: "nonexistent2",
         value: "bad",
@@ -194,13 +195,13 @@ describe("DiGraphV1", () => {
 
     test("error propagates through operations", () => {
       const g = creatGraphV1<string, string>();
-      const badEdge = g.newEdge({
+      const badEdge = newEdge({
         fromId: "bad1",
         toId: "bad2",
         value: "edge",
       });
       const g2 = g.setEdge(badEdge);
-      const node = g2.newNode("test");
+      const node = newNode("test");
       const g3 = g2.setNode(node);
 
       expect(g3.error()).toBeDefined();
@@ -211,9 +212,9 @@ describe("DiGraphV1", () => {
   describe("filtering operations", () => {
     test("filterNodes keeps matching nodes", () => {
       const g = creatGraphV1<{ val: number }, string>();
-      const n1 = g.newNode({ val: 1 });
-      const n2 = g.newNode({ val: 2 });
-      const n3 = g.newNode({ val: 3 });
+      const n1 = newNode({ val: 1 });
+      const n2 = newNode({ val: 2 });
+      const n3 = newNode({ val: 3 });
       const g2 = g.setNode(n1).setNode(n2).setNode(n3);
 
       const filtered = g2.filterNodes((node) => node.value.val > 1);
@@ -225,9 +226,9 @@ describe("DiGraphV1", () => {
     test("filterNodeValues with predicate", () => {
       const g = creatGraphV1<number, string>();
       const g2 = g
-        .setNode(g.newNode(1))
-        .setNode(g.newNode(2))
-        .setNode(g.newNode(3));
+        .setNode(newNode(1))
+        .setNode(newNode(2))
+        .setNode(newNode(3));
 
       const filtered = g2.filterNodeValues((v) => v % 2 === 0);
 
@@ -238,17 +239,17 @@ describe("DiGraphV1", () => {
 
     test("filterEdges keeps matching edges", () => {
       const g = creatGraphV1<string, { weight: number }>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
-      const n3 = g.newNode("C");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
+      const n3 = newNode("C");
       let graph = g.setNode(n1).setNode(n2).setNode(n3);
 
-      const e1 = graph.newEdge({
+      const e1 = newEdge({
         fromId: n1.id,
         toId: n2.id,
         value: { weight: 1 },
       });
-      const e2 = graph.newEdge({
+      const e2 = newEdge({
         fromId: n2.id,
         toId: n3.id,
         value: { weight: 5 },
@@ -263,13 +264,13 @@ describe("DiGraphV1", () => {
 
     test("filterEdgeValues with predicate", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
-      const n3 = g.newNode("C");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
+      const n3 = newNode("C");
       let graph = g.setNode(n1).setNode(n2).setNode(n3);
 
-      const e1 = graph.newEdge({ fromId: n1.id, toId: n2.id, value: "keep" });
-      const e2 = graph.newEdge({
+      const e1 = newEdge({ fromId: n1.id, toId: n2.id, value: "keep" });
+      const e2 = newEdge({
         fromId: n2.id,
         toId: n3.id,
         value: "remove",
@@ -285,8 +286,8 @@ describe("DiGraphV1", () => {
   describe("mapping operations", () => {
     test("mapNodeValues transforms values", () => {
       const g = creatGraphV1<number, string>();
-      const n1 = g.newNode(1);
-      const n2 = g.newNode(2);
+      const n1 = newNode(1);
+      const n2 = newNode(2);
       const g2 = g.setNode(n1).setNode(n2);
 
       const mapped = g2.mapNodeValues((n) => n * 2);
@@ -299,11 +300,11 @@ describe("DiGraphV1", () => {
 
     test("mapEdgeValues transforms edge values", () => {
       const g = creatGraphV1<string, number>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
       let graph = g.setNode(n1).setNode(n2);
 
-      const edge = graph.newEdge({ fromId: n1.id, toId: n2.id, value: 5 });
+      const edge = newEdge({ fromId: n1.id, toId: n2.id, value: 5 });
       graph = graph.setEdge(edge);
 
       const mapped = graph.mapEdgeValues((v) => v * 10);
@@ -315,7 +316,7 @@ describe("DiGraphV1", () => {
 
     test("mapNodes transforms entire nodes", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("a");
+      const n1 = newNode("a");
       const g2 = g.setNode(n1);
 
       const mapped = g2.mapNodes((node) => ({
@@ -329,11 +330,11 @@ describe("DiGraphV1", () => {
 
     test("mapEdges transforms entire edges", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
       let graph = g.setNode(n1).setNode(n2);
 
-      const edge = graph.newEdge({
+      const edge = newEdge({
         fromId: n1.id,
         toId: n2.id,
         value: "hello",
@@ -354,9 +355,9 @@ describe("DiGraphV1", () => {
     test("reduceNodeValues accumulates values", () => {
       const g = creatGraphV1<number, string>();
       const g2 = g
-        .setNode(g.newNode(1))
-        .setNode(g.newNode(2))
-        .setNode(g.newNode(3));
+        .setNode(newNode(1))
+        .setNode(newNode(2))
+        .setNode(newNode(3));
 
       const sum = g2.reduceNodeValues((acc, val) => acc + val, 0);
 
@@ -365,13 +366,13 @@ describe("DiGraphV1", () => {
 
     test("reduceEdgeValues accumulates edge values", () => {
       const g = creatGraphV1<string, number>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
-      const n3 = g.newNode("C");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
+      const n3 = newNode("C");
       let graph = g.setNode(n1).setNode(n2).setNode(n3);
 
-      const e1 = graph.newEdge({ fromId: n1.id, toId: n2.id, value: 10 });
-      const e2 = graph.newEdge({ fromId: n2.id, toId: n3.id, value: 20 });
+      const e1 = newEdge({ fromId: n1.id, toId: n2.id, value: 10 });
+      const e2 = newEdge({ fromId: n2.id, toId: n3.id, value: 20 });
       graph = graph.setEdge(e1).setEdge(e2);
 
       const total = graph.reduceEdgeValues((acc, val) => acc + val, 0);
@@ -382,9 +383,9 @@ describe("DiGraphV1", () => {
     test("reduceNodes with complex accumulator", () => {
       const g = creatGraphV1<string, string>();
       const g2 = g
-        .setNode(g.newNode("a"))
-        .setNode(g.newNode("b"))
-        .setNode(g.newNode("c"));
+        .setNode(newNode("a"))
+        .setNode(newNode("b"))
+        .setNode(newNode("c"));
 
       const result = g2.reduceNodes(
         (acc, node) => [...acc, node.value],
@@ -401,7 +402,7 @@ describe("DiGraphV1", () => {
   describe("forEach operations", () => {
     test("forEachNode executes for all nodes", () => {
       const g = creatGraphV1<number, string>();
-      const g2 = g.setNode(g.newNode(1)).setNode(g.newNode(2));
+      const g2 = g.setNode(newNode(1)).setNode(newNode(2));
 
       const values: number[] = [];
       g2.forEachNode((node) => values.push(node.value));
@@ -413,7 +414,7 @@ describe("DiGraphV1", () => {
 
     test("forEachNodeValue executes for all values", () => {
       const g = creatGraphV1<string, string>();
-      const g2 = g.setNode(g.newNode("a")).setNode(g.newNode("b"));
+      const g2 = g.setNode(newNode("a")).setNode(newNode("b"));
 
       const values: string[] = [];
       g2.forEachNodeValue((val) => values.push(val));
@@ -425,11 +426,11 @@ describe("DiGraphV1", () => {
 
     test("forEachEdge executes for all edges", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
       let graph = g.setNode(n1).setNode(n2);
 
-      const edge = graph.newEdge({
+      const edge = newEdge({
         fromId: n1.id,
         toId: n2.id,
         value: "edge",
@@ -445,11 +446,11 @@ describe("DiGraphV1", () => {
 
     test("forEachEdgeValue executes for all edge values", () => {
       const g = creatGraphV1<string, number>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
       let graph = g.setNode(n1).setNode(n2);
 
-      const edge = graph.newEdge({ fromId: n1.id, toId: n2.id, value: 42 });
+      const edge = newEdge({ fromId: n1.id, toId: n2.id, value: 42 });
       graph = graph.setEdge(edge);
 
       const values: number[] = [];
@@ -463,7 +464,7 @@ describe("DiGraphV1", () => {
   describe("query operations", () => {
     test("nodes returns all nodes", () => {
       const g = creatGraphV1<string, string>();
-      const g2 = g.setNode(g.newNode("a")).setNode(g.newNode("b"));
+      const g2 = g.setNode(newNode("a")).setNode(newNode("b"));
 
       const nodes = g2.nodes();
 
@@ -473,9 +474,9 @@ describe("DiGraphV1", () => {
     test("nodes with predicate filters results", () => {
       const g = creatGraphV1<number, string>();
       const g2 = g
-        .setNode(g.newNode(1))
-        .setNode(g.newNode(2))
-        .setNode(g.newNode(3));
+        .setNode(newNode(1))
+        .setNode(newNode(2))
+        .setNode(newNode(3));
 
       const nodes = g2.nodes((node) => node.value > 1);
 
@@ -484,11 +485,11 @@ describe("DiGraphV1", () => {
 
     test("edges returns all edges", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
       let graph = g.setNode(n1).setNode(n2);
 
-      const e1 = graph.newEdge({ fromId: n1.id, toId: n2.id, value: "e1" });
+      const e1 = newEdge({ fromId: n1.id, toId: n2.id, value: "e1" });
       graph = graph.setEdge(e1);
 
       const edges = graph.edges();
@@ -498,13 +499,13 @@ describe("DiGraphV1", () => {
 
     test("edges with predicate filters results", () => {
       const g = creatGraphV1<string, number>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
-      const n3 = g.newNode("C");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
+      const n3 = newNode("C");
       let graph = g.setNode(n1).setNode(n2).setNode(n3);
 
-      const e1 = graph.newEdge({ fromId: n1.id, toId: n2.id, value: 1 });
-      const e2 = graph.newEdge({ fromId: n2.id, toId: n3.id, value: 5 });
+      const e1 = newEdge({ fromId: n1.id, toId: n2.id, value: 1 });
+      const e2 = newEdge({ fromId: n2.id, toId: n3.id, value: 5 });
       graph = graph.setEdge(e1).setEdge(e2);
 
       const edges = graph.edges((edge) => edge.value > 2);
@@ -515,7 +516,7 @@ describe("DiGraphV1", () => {
 
     test("nodeValues returns all node values", () => {
       const g = creatGraphV1<string, string>();
-      const g2 = g.setNode(g.newNode("a")).setNode(g.newNode("b"));
+      const g2 = g.setNode(newNode("a")).setNode(newNode("b"));
 
       const values = g2.nodeValues();
 
@@ -526,11 +527,11 @@ describe("DiGraphV1", () => {
 
     test("edgeValues returns all edge values", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
       let graph = g.setNode(n1).setNode(n2);
 
-      const edge = graph.newEdge({
+      const edge = newEdge({
         fromId: n1.id,
         toId: n2.id,
         value: "connect",
@@ -546,9 +547,9 @@ describe("DiGraphV1", () => {
     test("nodeCount with predicate", () => {
       const g = creatGraphV1<number, string>();
       const g2 = g
-        .setNode(g.newNode(1))
-        .setNode(g.newNode(2))
-        .setNode(g.newNode(3));
+        .setNode(newNode(1))
+        .setNode(newNode(2))
+        .setNode(newNode(3));
 
       const count = g2.nodeCount((node) => node.value > 1);
 
@@ -557,13 +558,13 @@ describe("DiGraphV1", () => {
 
     test("edgeCount with predicate", () => {
       const g = creatGraphV1<string, number>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
-      const n3 = g.newNode("C");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
+      const n3 = newNode("C");
       let graph = g.setNode(n1).setNode(n2).setNode(n3);
 
-      const e1 = graph.newEdge({ fromId: n1.id, toId: n2.id, value: 1 });
-      const e2 = graph.newEdge({ fromId: n2.id, toId: n3.id, value: 5 });
+      const e1 = newEdge({ fromId: n1.id, toId: n2.id, value: 1 });
+      const e2 = newEdge({ fromId: n2.id, toId: n3.id, value: 5 });
       graph = graph.setEdge(e1).setEdge(e2);
 
       const count = graph.edgeCount((edge) => edge.value < 3);
@@ -575,7 +576,7 @@ describe("DiGraphV1", () => {
   describe("JSON serialization", () => {
     test("toJson serializes graph", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("node1");
+      const n1 = newNode("node1");
       const g2 = g.setNode(n1);
 
       const result = g2.toJson();
@@ -589,7 +590,7 @@ describe("DiGraphV1", () => {
 
     test("toJson with pretty formatting", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("test");
+      const n1 = newNode("test");
       const g2 = g.setNode(n1);
 
       const result = g2.toJson({ pretty: true });
@@ -602,7 +603,7 @@ describe("DiGraphV1", () => {
 
     test("toJson fails on graph with error", () => {
       const g = creatGraphV1<string, string>();
-      const badEdge = g.newEdge({ fromId: "x", toId: "y", value: "e" });
+      const badEdge = newEdge({ fromId: "x", toId: "y", value: "e" });
       const g2 = g.setEdge(badEdge);
 
       const result = g2.toJson();
@@ -615,8 +616,8 @@ describe("DiGraphV1", () => {
 
     test("fromJson deserializes graph", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("node1");
-      const n2 = g.newNode("node2");
+      const n1 = newNode("node1");
+      const n2 = newNode("node2");
       const g2 = g.setNode(n1).setNode(n2);
 
       const jsonResult = g2.toJson();
@@ -635,10 +636,10 @@ describe("DiGraphV1", () => {
 
     test("fromJson round-trip with edges", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
       const g2 = g.setNode(n1).setNode(n2);
-      const edge = g2.newEdge({ fromId: n1.id, toId: n2.id, value: "edge1" });
+      const edge = newEdge({ fromId: n1.id, toId: n2.id, value: "edge1" });
       const g3 = g2.setEdge(edge);
 
       const jsonResult = g3.toJson();
@@ -669,7 +670,7 @@ describe("DiGraphV1", () => {
   describe("match method", () => {
     test("match handles success case", () => {
       const g = creatGraphV1<string, string>();
-      const node = g.newNode("test");
+      const node = newNode("test");
       const g2 = g.setNode(node);
 
       const result = g2.match(
@@ -685,7 +686,7 @@ describe("DiGraphV1", () => {
 
     test("match handles error case", () => {
       const g = creatGraphV1<string, string>();
-      const badEdge = g.newEdge({ fromId: "x", toId: "y", value: "e" });
+      const badEdge = newEdge({ fromId: "x", toId: "y", value: "e" });
       const g2 = g.setEdge(badEdge);
 
       const result = g2.match(
@@ -701,7 +702,7 @@ describe("DiGraphV1", () => {
 
     test("match success function receives graph", () => {
       const g = creatGraphV1<number, string>();
-      const g2 = g.setNode(g.newNode(42));
+      const g2 = g.setNode(newNode(42));
 
       const result = g2.match(
         (graph) => graph.nodeValues()[0],
@@ -716,7 +717,7 @@ describe("DiGraphV1", () => {
 
     test("match error function receives error", () => {
       const g = creatGraphV1<string, string>();
-      const badEdge = g.newEdge({ fromId: "a", toId: "b", value: "e" });
+      const badEdge = newEdge({ fromId: "a", toId: "b", value: "e" });
       const g2 = g.setEdge(badEdge);
 
       const result = g2.match(
@@ -734,12 +735,12 @@ describe("DiGraphV1", () => {
   describe("complex graph scenarios", () => {
     test("build graph with multiple edges between same nodes", () => {
       const g = creatGraphV1<string, string>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
       let graph = g.setNode(n1).setNode(n2);
 
-      const e1 = graph.newEdge({ fromId: n1.id, toId: n2.id, value: "edge1" });
-      const e2 = graph.newEdge({ fromId: n1.id, toId: n2.id, value: "edge2" });
+      const e1 = newEdge({ fromId: n1.id, toId: n2.id, value: "edge1" });
+      const e2 = newEdge({ fromId: n1.id, toId: n2.id, value: "edge2" });
       graph = graph.setEdge(e1).setEdge(e2);
 
       expect(graph.edgeCount()).toBe(2);
@@ -751,15 +752,15 @@ describe("DiGraphV1", () => {
     test("build complex graph structure", () => {
       const g = creatGraphV1<string, string>();
 
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
-      const n3 = g.newNode("C");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
+      const n3 = newNode("C");
 
       let graph = g.setNode(n1).setNode(n2).setNode(n3);
 
-      const e1 = graph.newEdge({ fromId: n1.id, toId: n2.id, value: "A->B" });
-      const e2 = graph.newEdge({ fromId: n2.id, toId: n3.id, value: "B->C" });
-      const e3 = graph.newEdge({ fromId: n1.id, toId: n3.id, value: "A->C" });
+      const e1 = newEdge({ fromId: n1.id, toId: n2.id, value: "A->B" });
+      const e2 = newEdge({ fromId: n2.id, toId: n3.id, value: "B->C" });
+      const e3 = newEdge({ fromId: n1.id, toId: n3.id, value: "A->C" });
 
       graph = graph.setEdge(e1).setEdge(e2).setEdge(e3);
 
@@ -778,10 +779,10 @@ describe("DiGraphV1", () => {
     test("chain multiple transformations", () => {
       const g = creatGraphV1<number, number>();
       const g2 = g
-        .setNode(g.newNode(1))
-        .setNode(g.newNode(2))
-        .setNode(g.newNode(3))
-        .setNode(g.newNode(4));
+        .setNode(newNode(1))
+        .setNode(newNode(2))
+        .setNode(newNode(3))
+        .setNode(newNode(4));
 
       const result = g2
         .filterNodeValues((v) => v > 1)
@@ -793,13 +794,13 @@ describe("DiGraphV1", () => {
 
     test("combine operations on nodes and edges", () => {
       const g = creatGraphV1<string, number>();
-      const n1 = g.newNode("A");
-      const n2 = g.newNode("B");
-      const n3 = g.newNode("C");
+      const n1 = newNode("A");
+      const n2 = newNode("B");
+      const n3 = newNode("C");
       let graph = g.setNode(n1).setNode(n2).setNode(n3);
 
-      const e1 = graph.newEdge({ fromId: n1.id, toId: n2.id, value: 10 });
-      const e2 = graph.newEdge({ fromId: n2.id, toId: n3.id, value: 20 });
+      const e1 = newEdge({ fromId: n1.id, toId: n2.id, value: 10 });
+      const e2 = newEdge({ fromId: n2.id, toId: n3.id, value: 20 });
       graph = graph.setEdge(e1).setEdge(e2);
 
       const totalWeight = graph.reduceEdgeValues((acc, v) => acc + v, 0);

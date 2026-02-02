@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watch"
   },
@@ -11,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "type": "module",
+  "files": [
+    "src/"
+  ],
   "devDependencies": {
     "@jest/globals": "^30.2.0",
     "@types/jest": "^30.0.0",

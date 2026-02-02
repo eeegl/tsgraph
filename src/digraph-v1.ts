@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
-import type { Edge, Node, Result } from "../types.js";
-import type { DiGraph } from "./interface.js";
+import type { Edge, Node, Result } from "./types.js";
+import type { DiGraph } from "./digraph-interface.js";
 import { newIsoUtc, type IsoDatetimeUtcExtendedMs } from "@eeegl/tstime";
-import { _err, _ok } from "../shared.js";
+import { _err, _ok } from "./shared.js";
 
 export const creatGraphV1 = <N, E = string>(): DiGraph<N, E> =>
   new DiGraphV1<N, E>();
@@ -68,30 +68,6 @@ class DiGraphV1<N, E> implements DiGraph<N, E> {
     return shouldCount
       ? this.edges().filter(shouldCount).length
       : this.edges().length;
-  }
-
-  newNode(value: N): Node<N> {
-    return {
-      id: randomUUID(),
-      url: "github.com/eeegl/tsgraph/node",
-      type: "node",
-      created: newIsoUtc().datetimeExtendedMs,
-      value,
-      edgeIdsIn: [],
-      edgeIdsOut: [],
-    };
-  }
-
-  newEdge(params: { fromId: string; toId: string; value: E }): Edge<E> {
-    return {
-      id: randomUUID(),
-      url: "github.com/eeegl/tsgraph/edge",
-      type: "edge",
-      created: newIsoUtc().datetimeExtendedMs,
-      fromId: params.fromId,
-      toId: params.toId,
-      value: params.value,
-    };
   }
 
   nodes(keep?: ((node: Node<N>) => boolean) | undefined): Node<N>[] {
