@@ -358,7 +358,6 @@ if (result.ok) {
 ```typescript
 type Node<T> = {
   id: string;
-  url: "github.com/eeegl/tsgraph/node";
   type: "node";
   created: IsoDatetimeUtcExtendedMs;
   value: T;
@@ -372,7 +371,6 @@ type Node<T> = {
 ```typescript
 type Edge<T> = {
   id: string;
-  url: "github.com/eeegl/tsgraph/edge";
   type: "edge";
   created: IsoDatetimeUtcExtendedMs;
   fromId: string;  // Source node ID
