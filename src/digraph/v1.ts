@@ -274,7 +274,14 @@ class DiGraphV1<N, E> implements DiGraph<N, E> {
 
     try {
       const { pretty = false } = params ?? {};
-      const json = JSON.stringify(this, null, pretty ? 2 : 0);
+      const serializable = {
+        _id: this._id,
+        _created: this._created,
+        _nodes: Object.fromEntries(this._nodes),
+        _edges: Object.fromEntries(this._edges),
+        _error: this._error,
+      };
+      const json = JSON.stringify(serializable, null, pretty ? 2 : 0);
       return _ok(json);
     } catch (x: unknown) {
       return _err(
