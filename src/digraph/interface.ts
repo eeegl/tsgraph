@@ -5,6 +5,12 @@ export interface DiGraph<N, E> {
   id(): string;
   created(): IsoDatetimeUtcExtendedMs;
 
+  error(): Error | undefined;
+  match<T, ErrT>(
+    fn: (graph: DiGraph<N, E>) => T,
+    errorFn: (e: Error) => ErrT,
+  ): { ok: true; value: T } | { ok: false; error: ErrT };
+
   hasNodes(): boolean;
   hasEdges(): boolean;
 
@@ -51,17 +57,11 @@ export interface DiGraph<N, E> {
     start: T,
   ): T;
 
-  // addNode(node: Node<N>): DiGraph<N, E>;
-  // getNode(id: string): Node<N> | undefined;
-  // setNode(id: string, node: Node<N>): DiGraph<N, E>;
-  // delNode(id: string): DiGraph<N, E>;
-  // delNodes(shouldDelete: (node: Node<N>) => boolean): DiGraph<N, E>;
+  setNode(node: Node<N>): DiGraph<N, E>;
+  getNode(id: string): Node<N> | undefined;
 
-  // addEdge(edge: Edge<N>): DiGraph<N, E>;
-  // getEdge(id: string): N | undefined;
-  // setEdge(id: string, value: N): DiGraph<N, E>;
-  // delEdge(id: string): DiGraph<N, E>;
-  // delEdges(shouldDelete: (value: N) => boolean): DiGraph<N, E>;
+  setEdge(edge: Edge<E>): DiGraph<N, E>;
+  getEdge(id: string): Edge<E> | undefined;
 
   // toJson(params?: { pretty: boolean }): string;
   // fromJson<N, E>(
