@@ -8,17 +8,15 @@ export interface DiGraph<T> {
   hasNodes(): boolean;
   hasEdges(): boolean;
 
-  hasOrphans(): boolean;
-  orphans(): Node<T>[];
-
-  hasBadEdges(): boolean;
-  badEdges(): Edge<T>[];
-
   nodeCount(shouldCount?: (node: Node<T>) => boolean): number;
   edgeCount(shouldCount?: (edge: Edge<T>) => boolean): number;
 
   newNode(value: T): Node<T>;
   newEdge(from: Node<T>, to: Node<T>): Edge<T>;
+  
+  values(shouldInclude?: (value: T) => boolean): T[];
+  nodes(shouldInclude?: (node: Node<T>) => boolean): Node<T>[];
+  edges(shouldInclude?: (edge: Edge<T>) => boolean): Edge<T>[];
 
   addNode(node: Node<T>): DiGraph<T>;
   getNode(id: string): Node<T> | undefined;
@@ -32,9 +30,13 @@ export interface DiGraph<T> {
   delEdge(id: string): DiGraph<T>;
   delEdges(shouldDelete: (value: T) => boolean): DiGraph<T>;
 
-  values(shouldInclude?: (value: T) => boolean): T[];
-  nodes(shouldInclude?: (node: Node<T>) => boolean): Node<T>[];
-  edges(shouldInclude?: (edge: Edge<T>) => boolean): Edge<T>[];
+  isOrphan(node: Node<T>): boolean;
+  hasOrphans(): boolean;
+  orphans(): Node<T>[];
+
+  isDanglingEdge(edge: Edge<T>): boolean;
+  hasDanglingEdges(): boolean;
+  danglingEdges(): Edge<T>[];
 
   forEachValue(fn: (value: T) => void): DiGraph<T>;
   forEachNode(fn: (node: Node<T>) => void): DiGraph<T>;

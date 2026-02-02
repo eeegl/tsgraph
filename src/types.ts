@@ -10,6 +10,7 @@ export type Node<T> = {
 
 export type Edge<T> = {
   id: string;
+  created: IsoDatetimeUtcExtendedMs;
   from: Node<T>;
   to: Node<T>;
 };

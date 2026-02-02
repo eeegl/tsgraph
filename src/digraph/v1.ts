@@ -1,53 +1,107 @@
+import { randomUUID } from "node:crypto";
 import { createNode } from "../shared.js";
 import type { Edge, Node } from "../types.js";
 import type { DiGraph } from "./interface.js";
+import { newIsoUtc, type IsoDatetimeUtcExtendedMs } from "@eeegl/tstime";
 
 export const creatGraphV1 = <T>(values?: T[]): DiGraph<T> =>
   new DiGraphV1(values);
 
 class DiGraphV1<T> implements DiGraph<T> {
+  private _id: string;
+  private _created: IsoDatetimeUtcExtendedMs;
   private _nodes: Node<T>[];
   private _edges: Edge<T>[];
 
-  constructor(nodes: Node<T>[] = []) {
-    this._nodes = nodes;
+  constructor(params?: {
+    id?: string;
+    created: Date;
+    nodes?: Node<T>[];
+    edges?: Edge<T>[];
+  }) {
+    this._id = params?.id ?? randomUUID();
+    this._created = newIsoUtc(params?.created).datetimeExtendedMs;
+    this._nodes = params?.nodes ?? [];
+    this._edges = params?.edges ?? [];
   }
 
-  add(value: T): DiGraph<T> {
-    return new DiGraphV1([value, ...this.values()]);
+  id(): string {
+    return this._id;
   }
 
-  del(filter: (value: T) => boolean): DiGraph<T> {
-    return new DiGraphV1(this.values().filter((v) => !filter(v)));
+  created(): IsoDatetimeUtcExtendedMs {
+    return this._created;
   }
 
-  values(filter?: ((value: T) => boolean) | undefined): T[] {
-    return this._nodes
-      .map((node) => node.value)
-      .filter((v) => (filter ? filter(v) : true));
+  hasNodes(): boolean {
+    return this._nodes.length > 0;
   }
 
-  nodes(filter?: ((node: Node<T>) => boolean) | undefined): Node<T>[] {
-    return filter ? this._nodes.filter(filter) : this._nodes;
+  hasEdges(): boolean {
+    return this._edges.length > 0;
   }
 
-  map<U>(fn: (value: T) => U): DiGraph<U> {
-    return new DiGraphV1(this.values().map(fn));
+  nodeCount(shouldCount?: ((node: Node<T>) => boolean) | undefined): number {
+    return shouldCount
+      ? this._nodes.filter(shouldCount).length
+      : this._nodes.length;
   }
 
-  filter(fn: (value: T) => boolean): DiGraph<T> {
-    return new DiGraphV1(this.values().filter(fn));
+  edgeCount(shouldCount?: ((edge: Edge<T>) => boolean) | undefined): number {
+    return shouldCount
+      ? this._edges.filter(shouldCount).length
+      : this._edges.length;
   }
 
-  reduce<U>(fn: (acc: U, current: T, index: number) => U, start: U): U {
-    return this.values().reduce(fn, start);
+  newNode(value: T): Node<T> {
+    return {
+      id: randomUUID(),
+      created: newIsoUtc().datetimeExtendedMs,
+      value,
+      edgesIn: [],
+      edgesOut: [],
+    };
   }
 
-  numNodes(): number {
-    return this._nodes.length;
+  newEdge(from: Node<T>, to: Node<T>): Edge<T> {
+    return {
+      id: randomUUID(),
+      created: newIsoUtc().datetimeExtendedMs,
+      from,
+      to,
+    };
   }
 
-  isEmpty(): boolean {
-    return this.numNodes() !== 0;
+  values(shouldInclude?: ((value: T) => boolean) | undefined): T[] {
+    const values = this._nodes.map((n) => n.value);
+    return shouldInclude ? values.filter(shouldInclude) : values;
   }
+
+  nodes(shouldInclude?: ((node: Node<T>) => boolean) | undefined): Node<T>[] {
+    return shouldInclude ? this._nodes.filter(shouldInclude) : this._nodes;
+  }
+
+  edges(shouldInclude?: ((edge: Edge<T>) => boolean) | undefined): Edge<T>[] {
+    return shouldInclude ? this._edges.filter(shouldInclude) : this._edges;
+  }
+
+  //   addNode(node: Node<T>): DiGraph<T> {
+  //     //   return new DiGraphV1({ id: this.id(), created: new Date(), edges: this.ed})
+  //   }
+
+  //   isOrphan(node: Node<T>): boolean {
+  //     return node.edgesIn.length === 0 && node.edgesOut.length === 0;
+  //   }
+
+  //   hasOrphans(): boolean {
+  //     return this._nodes.some(this.isOrphan);
+  //   }
+
+  //   orphans(): Node<T>[] {
+  //     return this._nodes.filter(this.isOrphan);
+  //   }
+
+  //   isDanglingEdge(edge: Edge<T>): boolean {
+  //       return edge.
+  //   }
 }
