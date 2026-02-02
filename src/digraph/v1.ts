@@ -118,7 +118,7 @@ class DiGraphV1<N, E> implements DiGraph<N, E> {
     return new DiGraphV1({
       id: this.id(),
       created: new Date(this.created()),
-      nodes: new Map(this._nodes.entries().filter(([, node]) => keep(node))),
+      nodes: new Map(Array.from(this._nodes).filter(([, node]) => keep(node))),
       edges: this._edges,
     });
   }
@@ -128,7 +128,7 @@ class DiGraphV1<N, E> implements DiGraph<N, E> {
       id: this.id(),
       created: new Date(this.created()),
       nodes: this._nodes,
-      edges: new Map(this._edges.entries().filter(([, edge]) => keep(edge))),
+      edges: new Map(Array.from(this._edges).filter(([, edge]) => keep(edge))),
     });
   }
 
@@ -219,7 +219,7 @@ class DiGraphV1<N, E> implements DiGraph<N, E> {
     return new DiGraphV1({
       id: this.id(),
       created: new Date(this.created()),
-      nodes: this._nodes.set(node.id, node),
+      nodes: new Map(this._nodes).set(node.id, node),
       edges: this._edges,
     });
   }
@@ -235,25 +235,33 @@ class DiGraphV1<N, E> implements DiGraph<N, E> {
     const to = this.getNode(edge.toId);
 
     if (!from || !to) {
-      this._error = new Error(
-        `undefined edge: fromId=${edge.fromId}; toId=${edge.toId}`,
-      );
-      return this;
+      return new DiGraphV1({
+        error: new Error(
+          `undefined edge: fromId=${edge.fromId}; toId=${edge.toId}`,
+        ),
+        id: this.id(),
+        created: new Date(this.created()),
+        nodes: this._nodes,
+        edges: this._edges,
+      });
     }
+
+    const newEdges = new Map(this._edges);
+    newEdges.set(edge.id, edge);
 
     const graph = new DiGraphV1({
       id: this.id(),
       created: new Date(this.created()),
       nodes: this._nodes,
-      edges: this._edges.set(edge.id, edge),
+      edges: newEdges,
     });
 
     return graph
       .setNode({
         ...from,
-        edgeIdsOut: [edge.id, ...from?.edgeIdsOut],
+        edgeIdsOut: [edge.id, ...from.edgeIdsOut],
       })
-      .setNode({ ...to, edgeIdsIn: [edge.id, ...to?.edgeIdsIn] });
+      .setNode({ ...to, edgeIdsIn: [edge.id, ...to.edgeIdsIn] });
   }
 
   getEdge(id: string): Edge<E> | undefined {
@@ -277,7 +285,30 @@ class DiGraphV1<N, E> implements DiGraph<N, E> {
 
   fromJson<N, E>(json: string): Result<DiGraph<N, E>, Error> {
     try {
-      const graph = JSON.parse(json);
+      const parsed = JSON.parse(json);
+
+      const nodes = new Map(
+        Object.entries(parsed._nodes ?? {}).map(([id, node]: [string, any]) => [
+          id,
+          node,
+        ]),
+      );
+
+      const edges = new Map(
+        Object.entries(parsed._edges ?? {}).map(([id, edge]: [string, any]) => [
+          id,
+          edge,
+        ]),
+      );
+
+      const graph = new DiGraphV1<N, E>({
+        id: parsed._id,
+        created: parsed._created ? new Date(parsed._created) : new Date(),
+        nodes,
+        edges,
+        error: parsed._error,
+      });
+
       return _ok(graph);
     } catch (x: unknown) {
       return _err(
