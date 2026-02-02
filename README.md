@@ -11,17 +11,17 @@ npm install @eeegl/tsgraph
 ## Quick Start
 
 ```typescript
-import { creatGraphV1 } from "@eeegl/tsgraph";
+import { creatGraphV1, newNode, newEdge } from "@eeegl/tsgraph";
 
 const graph = creatGraphV1<string, string>();
 
-const nodeA = graph.newNode("A");
-const nodeB = graph.newNode("B");
+const nodeA = newNode("A");
+const nodeB = newNode("B");
 
 const g = graph
   .setNode(nodeA)
   .setNode(nodeB)
-  .setEdge(graph.newEdge({ fromId: nodeA.id, toId: nodeB.id, value: "connects" }));
+  .setEdge(newEdge({ fromId: nodeA.id, toId: nodeB.id, value: "connects" }));
 
 console.log(g.nodeCount()); // 2
 console.log(g.edgeCount()); // 1
@@ -34,7 +34,6 @@ console.log(g.edgeCount()); // 1
 - Functional programming style (map, filter, reduce)
 - Error handling with Result types
 - JSON serialization/deserialization
-- Zero dependencies (except `@eeegl/tstime` for timestamps)
 
 ## API Reference
 
@@ -93,22 +92,28 @@ Returns the count of edges. If predicate is provided, counts only matching edges
 
 ### Creating Nodes and Edges
 
-#### `newNode(value: N): Node<N>`
+#### `newNode<N>(value: N): Node<N>`
 
 Creates a new node with the given value. The node has a unique ID and timestamp.
+This is a standalone function exported from the package.
 
 **Example:**
 ```typescript
-const node = graph.newNode({ name: "Alice", age: 30 });
+import { newNode } from "@eeegl/tsgraph";
+
+const node = newNode({ name: "Alice", age: 30 });
 ```
 
-#### `newEdge(params: { fromId: string; toId: string; value: E }): Edge<E>`
+#### `newEdge<E>(params: { fromId: string; toId: string; value: E }): Edge<E>`
 
 Creates a new edge connecting two nodes.
+This is a standalone function exported from the package.
 
 **Example:**
 ```typescript
-const edge = graph.newEdge({
+import { newEdge } from "@eeegl/tsgraph";
+
+const edge = newEdge({
   fromId: nodeA.id,
   toId: nodeB.id,
   value: "follows"
@@ -123,7 +128,9 @@ Adds or updates a node in the graph. Returns a new graph instance.
 
 **Example:**
 ```typescript
-const node = graph.newNode("value");
+import { newNode } from "@eeegl/tsgraph";
+
+const node = newNode("value");
 const newGraph = graph.setNode(node);
 ```
 
@@ -133,7 +140,9 @@ Adds an edge to the graph. Both nodes must exist. Updates the edge lists of conn
 
 **Example:**
 ```typescript
-const edge = graph.newEdge({ fromId: n1.id, toId: n2.id, value: "edge" });
+import { newEdge } from "@eeegl/tsgraph";
+
+const edge = newEdge({ fromId: n1.id, toId: n2.id, value: "edge" });
 const newGraph = graph.setEdge(edge);
 ```
 
@@ -385,17 +394,19 @@ type Result<T, ErrT> =
 ### Building a Graph
 
 ```typescript
+import { creatGraphV1, newNode, newEdge } from "@eeegl/tsgraph";
+
 const graph = creatGraphV1<string, number>();
 
-const nodes = ["A", "B", "C"].map(v => graph.newNode(v));
+const nodes = ["A", "B", "C"].map(v => newNode(v));
 let g = graph;
 
 for (const node of nodes) {
   g = g.setNode(node);
 }
 
-const edge1 = g.newEdge({ fromId: nodes[0].id, toId: nodes[1].id, value: 1 });
-const edge2 = g.newEdge({ fromId: nodes[1].id, toId: nodes[2].id, value: 2 });
+const edge1 = newEdge({ fromId: nodes[0].id, toId: nodes[1].id, value: 1 });
+const edge2 = newEdge({ fromId: nodes[1].id, toId: nodes[2].id, value: 2 });
 
 g = g.setEdge(edge1).setEdge(edge2);
 
@@ -406,13 +417,17 @@ console.log(g.edgeCount()); // 2
 ### Filtering and Mapping
 
 ```typescript
-const graph = creatGraphV1<number, string>()
-  .setNode(graph.newNode(1))
-  .setNode(graph.newNode(2))
-  .setNode(graph.newNode(3))
-  .setNode(graph.newNode(4));
+import { creatGraphV1, newNode } from "@eeegl/tsgraph";
 
-const result = graph
+const graph = creatGraphV1<number, string>();
+
+const g = graph
+  .setNode(newNode(1))
+  .setNode(newNode(2))
+  .setNode(newNode(3))
+  .setNode(newNode(4));
+
+const result = g
   .filterNodeValues(v => v % 2 === 0)
   .mapNodeValues(v => v * 10)
   .reduceNodeValues((sum, v) => sum + v, 0);
@@ -423,11 +438,13 @@ console.log(result); // 60 (20 + 40)
 ### Error Handling
 
 ```typescript
+import { creatGraphV1, newNode, newEdge } from "@eeegl/tsgraph";
+
 const graph = creatGraphV1<string, string>();
-const node = graph.newNode("A");
+const node = newNode("A");
 const g = graph.setNode(node);
 
-const badEdge = g.newEdge({
+const badEdge = newEdge({
   fromId: node.id,
   toId: "nonexistent",
   value: "error"
@@ -448,9 +465,13 @@ if (!result.ok) {
 ### JSON Round-Trip
 
 ```typescript
-const original = creatGraphV1<string, string>()
-  .setNode(original.newNode("A"))
-  .setNode(original.newNode("B"));
+import { creatGraphV1, newNode } from "@eeegl/tsgraph";
+
+const graph = creatGraphV1<string, string>();
+
+const original = graph
+  .setNode(newNode("A"))
+  .setNode(newNode("B"));
 
 const jsonResult = original.toJson({ pretty: true });
 
@@ -471,7 +492,3 @@ npm install
 npm test
 npm run test:watch
 ```
-
-## License
-
-ISC
