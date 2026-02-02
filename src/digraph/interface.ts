@@ -1,61 +1,70 @@
 import type { IsoDatetimeUtcExtendedMs } from "@eeegl/tstime";
 import type { Edge, Node } from "../types.js";
 
-export interface DiGraph<T> {
+export interface DiGraph<N, E> {
   id(): string;
   created(): IsoDatetimeUtcExtendedMs;
 
   hasNodes(): boolean;
   hasEdges(): boolean;
 
-  nodeCount(shouldCount?: (node: Node<T>) => boolean): number;
-  edgeCount(shouldCount?: (edge: Edge<T>) => boolean): number;
+  nodeCount(shouldCount?: (node: Node<N>) => boolean): number;
+  edgeCount(shouldCount?: (edge: Edge<E>) => boolean): number;
 
-  newNode(value: T): Node<T>;
-  newEdge(from: Node<T>, to: Node<T>): Edge<T>;
-  
-  values(shouldInclude?: (value: T) => boolean): T[];
-  nodes(shouldInclude?: (node: Node<T>) => boolean): Node<T>[];
-  edges(shouldInclude?: (edge: Edge<T>) => boolean): Edge<T>[];
+  newNode(value: N): Node<N>;
+  newEdge(params: { fromId: string; toId: string; value: E }): Edge<E>;
 
-  addNode(node: Node<T>): DiGraph<T>;
-  getNode(id: string): Node<T> | undefined;
-  setNode(id: string, node: Node<T>): DiGraph<T>;
-  delNode(id: string): DiGraph<T>;
-  delNodes(shouldDelete: (node: Node<T>) => boolean): DiGraph<T>;
+  nodes(keep?: (node: Node<N>) => boolean): Node<N>[];
+  edges(keep?: (edge: Edge<E>) => boolean): Edge<E>[];
+  nodeValues(keep?: (value: N) => boolean): N[];
+  edgeValues(keep?: (value: E) => boolean): E[];
 
-  addEdge(edge: Edge<T>): DiGraph<T>;
-  getEdge(id: string): T | undefined;
-  setEdge(id: string, value: T): DiGraph<T>;
-  delEdge(id: string): DiGraph<T>;
-  delEdges(shouldDelete: (value: T) => boolean): DiGraph<T>;
+  filterNodes(keep: (node: Node<N>) => boolean): DiGraph<N, E>;
+  filterEdges(keep: (edge: Edge<E>) => boolean): DiGraph<N, E>;
+  filterNodeValues(keep: (value: N) => boolean): DiGraph<N, E>;
+  filterEdgeValues(keep: (value: E) => boolean): DiGraph<N, E>;
 
-  isOrphan(node: Node<T>): boolean;
-  hasOrphans(): boolean;
-  orphans(): Node<T>[];
+  forEachNode(fn: (node: Node<N>) => void): DiGraph<N, E>;
+  forEachEdge(fn: (edge: Edge<E>) => void): DiGraph<N, E>;
+  forEachNodeValue(fn: (value: N) => void): DiGraph<N, E>;
+  forEachEdgeValue(fn: (value: E) => void): DiGraph<N, E>;
 
-  isDanglingEdge(edge: Edge<T>): boolean;
-  hasDanglingEdges(): boolean;
-  danglingEdges(): Edge<T>[];
+  mapNodes<T>(fn: (node: Node<N>) => Node<T>): DiGraph<T, E>;
+  mapEdges<T>(fn: (edge: Edge<E>) => Edge<T>): DiGraph<N, T>;
+  mapNodeValues<T>(fn: (value: N) => T): DiGraph<T, E>;
+  mapEdgeValues<T>(fn: (value: E) => T): DiGraph<N, T>;
 
-  forEachValue(fn: (value: T) => void): DiGraph<T>;
-  forEachNode(fn: (node: Node<T>) => void): DiGraph<T>;
-  forEachEdge(fn: (edge: Edge<T>) => void): DiGraph<T>;
+  // reduceNodes<T>(
+  //   fn: (acc: T, current: Node<N>, index: number) => T,
+  //   start: T,
+  // ): T;
+  // reduceEdges<T>(
+  //   fn: (acc: T, current: Edge<E>, index: number) => T,
+  //   start: T,
+  // ): T;
+  // reduceNodeValues<T>(
+  //   fn: (acc: T, current: N, index: number) => T,
+  //   start: T,
+  // ): T;
+  // reduceEdgeValues<T>(
+  //   fn: (acc: T, current: E, index: number) => T,
+  //   start: T,
+  // ): T;
 
-  mapValues<U>(fn: (value: T) => U): DiGraph<U>;
-  mapNodes<U>(fn: (node: Node<T>) => Node<U>): DiGraph<U>;
-  mapEdges<U>(fn: (edge: Node<T>) => Node<U>): DiGraph<U>;
+  // addNode(node: Node<N>): DiGraph<N, E>;
+  // getNode(id: string): Node<N> | undefined;
+  // setNode(id: string, node: Node<N>): DiGraph<N, E>;
+  // delNode(id: string): DiGraph<N, E>;
+  // delNodes(shouldDelete: (node: Node<N>) => boolean): DiGraph<N, E>;
 
-  filterValues(shouldInclude: (value: T) => boolean): DiGraph<T>;
-  filterNodes(shouldInclude: (node: Node<T>) => boolean): DiGraph<T>;
-  filterEdges(shouldInclude: (edge: Edge<T>) => boolean): DiGraph<T>;
+  // addEdge(edge: Edge<N>): DiGraph<N, E>;
+  // getEdge(id: string): N | undefined;
+  // setEdge(id: string, value: N): DiGraph<N, E>;
+  // delEdge(id: string): DiGraph<N, E>;
+  // delEdges(shouldDelete: (value: N) => boolean): DiGraph<N, E>;
 
-  reduceValues<U>(fn: (acc: U, current: T, index: number) => U, start: U): U;
-  reduceNodes<U>(fn: (acc: U, current: T, index: number) => U, start: U): U;
-  reduceEdges<U>(fn: (acc: U, current: T, index: number) => U, start: U): U;
-
-  toJson(params?: { pretty: boolean }): string;
-  fromJson<T>(
-    json: string,
-  ): { ok: true; graph: DiGraph<T> } | { ok: false; error: Error };
+  // toJson(params?: { pretty: boolean }): string;
+  // fromJson<N, E>(
+  //   json: string,
+  // ): { ok: true; graph: DiGraph<N, E> } | { ok: false; error: Error };
 }

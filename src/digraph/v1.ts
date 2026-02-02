@@ -4,20 +4,20 @@ import type { Edge, Node } from "../types.js";
 import type { DiGraph } from "./interface.js";
 import { newIsoUtc, type IsoDatetimeUtcExtendedMs } from "@eeegl/tstime";
 
-export const creatGraphV1 = <T>(values?: T[]): DiGraph<T> =>
-  new DiGraphV1(values);
+export const creatGraphV1 = <N, E = string>(): DiGraph<N, E> =>
+  new DiGraphV1<N, E>();
 
-class DiGraphV1<T> implements DiGraph<T> {
+class DiGraphV1<N, E> implements DiGraph<N, E> {
   private _id: string;
   private _created: IsoDatetimeUtcExtendedMs;
-  private _nodes: Node<T>[];
-  private _edges: Edge<T>[];
+  private _nodes: Node<N>[];
+  private _edges: Edge<E>[];
 
   constructor(params?: {
     id?: string;
-    created: Date;
-    nodes?: Node<T>[];
-    edges?: Edge<T>[];
+    created?: Date;
+    nodes?: Node<N>[];
+    edges?: Edge<E>[];
   }) {
     this._id = params?.id ?? randomUUID();
     this._created = newIsoUtc(params?.created).datetimeExtendedMs;
@@ -41,67 +41,145 @@ class DiGraphV1<T> implements DiGraph<T> {
     return this._edges.length > 0;
   }
 
-  nodeCount(shouldCount?: ((node: Node<T>) => boolean) | undefined): number {
+  nodeCount(shouldCount?: ((node: Node<N>) => boolean) | undefined): number {
     return shouldCount
       ? this._nodes.filter(shouldCount).length
       : this._nodes.length;
   }
 
-  edgeCount(shouldCount?: ((edge: Edge<T>) => boolean) | undefined): number {
+  edgeCount(shouldCount?: ((edge: Edge<E>) => boolean) | undefined): number {
     return shouldCount
       ? this._edges.filter(shouldCount).length
       : this._edges.length;
   }
 
-  newNode(value: T): Node<T> {
+  newNode(value: N): Node<N> {
     return {
       id: randomUUID(),
       created: newIsoUtc().datetimeExtendedMs,
       value,
-      edgesIn: [],
-      edgesOut: [],
+      edgeIdsIn: [],
+      edgeIdsOut: [],
     };
   }
 
-  newEdge(from: Node<T>, to: Node<T>): Edge<T> {
+  newEdge(params: { fromId: string; toId: string; value: E }): Edge<E> {
     return {
       id: randomUUID(),
       created: newIsoUtc().datetimeExtendedMs,
-      from,
-      to,
+      fromId: params.fromId,
+      toId: params.toId,
+      value: params.value,
     };
   }
 
-  values(shouldInclude?: ((value: T) => boolean) | undefined): T[] {
+  nodes(keep?: ((node: Node<N>) => boolean) | undefined): Node<N>[] {
+    return keep ? this._nodes.filter(keep) : this._nodes;
+  }
+
+  edges(keep?: ((edge: Edge<E>) => boolean) | undefined): Edge<E>[] {
+    return keep ? this._edges.filter(keep) : this._edges;
+  }
+
+  nodeValues(keep?: ((value: N) => boolean) | undefined): N[] {
     const values = this._nodes.map((n) => n.value);
-    return shouldInclude ? values.filter(shouldInclude) : values;
+    return keep ? values.filter(keep) : values;
   }
 
-  nodes(shouldInclude?: ((node: Node<T>) => boolean) | undefined): Node<T>[] {
-    return shouldInclude ? this._nodes.filter(shouldInclude) : this._nodes;
+  edgeValues(keep?: ((value: E) => boolean) | undefined): E[] {
+    const values = this._edges.map((n) => n.value);
+    return keep ? values.filter(keep) : values;
   }
 
-  edges(shouldInclude?: ((edge: Edge<T>) => boolean) | undefined): Edge<T>[] {
-    return shouldInclude ? this._edges.filter(shouldInclude) : this._edges;
+  filterNodes(keep: (node: Node<N>) => boolean): DiGraph<N, E> {
+    return new DiGraphV1({
+      id: this.id(),
+      created: new Date(this.created()),
+      nodes: this.nodes().filter(keep),
+      edges: this.edges(),
+    });
   }
 
-  //   addNode(node: Node<T>): DiGraph<T> {
-  //     //   return new DiGraphV1({ id: this.id(), created: new Date(), edges: this.ed})
-  //   }
+  filterEdges(keep: (edge: Edge<E>) => boolean): DiGraph<N, E> {
+    return new DiGraphV1({
+      id: this.id(),
+      created: new Date(this.created()),
+      nodes: this.nodes(),
+      edges: this.edges().filter(keep),
+    });
+  }
 
-  //   isOrphan(node: Node<T>): boolean {
-  //     return node.edgesIn.length === 0 && node.edgesOut.length === 0;
-  //   }
+  filterNodeValues(keep: (value: N) => boolean): DiGraph<N, E> {
+    return new DiGraphV1({
+      id: this.id(),
+      created: new Date(this.created()),
+      nodes: this.nodes().filter((n) => keep(n.value)),
+      edges: this.edges(),
+    });
+  }
 
-  //   hasOrphans(): boolean {
-  //     return this._nodes.some(this.isOrphan);
-  //   }
+  filterEdgeValues(keep: (value: E) => boolean): DiGraph<N, E> {
+    return new DiGraphV1({
+      id: this.id(),
+      created: new Date(this.created()),
+      nodes: this.nodes(),
+      edges: this.edges().filter((n) => keep(n.value)),
+    });
+  }
 
-  //   orphans(): Node<T>[] {
-  //     return this._nodes.filter(this.isOrphan);
-  //   }
+  forEachNode(fn: (node: Node<N>) => void): DiGraph<N, E> {
+    this.nodes().forEach(fn);
+    return this;
+  }
 
-  //   isDanglingEdge(edge: Edge<T>): boolean {
-  //       return edge.
-  //   }
+  forEachEdge(fn: (edge: Edge<E>) => void): DiGraph<N, E> {
+    this.edges().forEach(fn);
+    return this;
+  }
+
+  forEachNodeValue(fn: (value: N) => void): DiGraph<N, E> {
+    this.nodeValues().forEach(fn);
+    return this;
+  }
+
+  forEachEdgeValue(fn: (value: E) => void): DiGraph<N, E> {
+    this.edgeValues().forEach(fn);
+    return this;
+  }
+
+  mapNodes<T>(fn: (node: Node<N>) => Node<T>): DiGraph<T, E> {
+    return new DiGraphV1({
+      id: this.id(),
+      created: new Date(this.created()),
+      nodes: this.nodes().map(fn),
+      edges: this.edges(),
+    });
+  }
+
+  mapEdges<T>(fn: (edge: Edge<E>) => Edge<T>): DiGraph<N, T> {
+    return new DiGraphV1({
+      id: this.id(),
+      created: new Date(this.created()),
+      nodes: this.nodes(),
+      edges: this.edges().map(fn),
+    });
+  }
+
+  mapNodeValues<T>(fn: (value: N) => T): DiGraph<T, E> {
+    return new DiGraphV1({
+      id: this.id(),
+      created: new Date(this.created()),
+      nodes: this.nodes().map((n) => ({ ...n, value: fn(n.value) })),
+      edges: this.edges(),
+    });
+  }
+
+  mapEdgeValues<T>(fn: (value: E) => T): DiGraph<N, T> {
+    return new DiGraphV1({
+      id: this.id(),
+      created: new Date(this.created()),
+      nodes: this.nodes(),
+      edges: this.edges().map((n) => ({ ...n, value: fn(n.value) })),
+    });
+  }
 }

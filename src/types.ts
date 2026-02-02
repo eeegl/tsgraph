@@ -4,13 +4,14 @@ export type Node<T> = {
   id: string;
   created: IsoDatetimeUtcExtendedMs;
   value: T;
-  edgesOut: Edge<T>[];
-  edgesIn: Edge<T>[];
+  edgeIdsOut: string[];
+  edgeIdsIn: string[];
 };
 
 export type Edge<T> = {
   id: string;
   created: IsoDatetimeUtcExtendedMs;
-  from: Node<T>;
-  to: Node<T>;
+  fromId: string;
+  toId: string;
+  value: T;
 };
