@@ -1,5 +1,5 @@
 {
-  "name": "tsgraph",
+  "name": "@eeegl/tsgraph",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
