@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
-import type { Edge, Node } from "../types.js";
+import type { Edge, Node, Result } from "../types.js";
 import type { DiGraph } from "./interface.js";
 import { newIsoUtc, type IsoDatetimeUtcExtendedMs } from "@eeegl/tstime";
+import { _err, _ok } from "../shared.js";
 
 export const creatGraphV1 = <N, E = string>(): DiGraph<N, E> =>
   new DiGraphV1<N, E>();
@@ -42,7 +43,7 @@ class DiGraphV1<N, E> implements DiGraph<N, E> {
   match<T, ErrT>(
     successFn: (graph: DiGraph<N, E>) => T,
     errorFn: (e: Error) => ErrT,
-  ): { ok: true; value: T } | { ok: false; error: ErrT } {
+  ): Result<T, ErrT> {
     const error = this.error();
     return error === undefined
       ? { ok: true, value: successFn(this) }
@@ -257,5 +258,31 @@ class DiGraphV1<N, E> implements DiGraph<N, E> {
 
   getEdge(id: string): Edge<E> | undefined {
     return this._edges.get(id);
+  }
+
+  toJson(params?: { pretty: boolean }): Result<string, Error> {
+    const error = this.error();
+    if (error) return _err(error);
+
+    try {
+      const { pretty = false } = params ?? {};
+      const json = JSON.stringify(this, null, pretty ? 2 : 0);
+      return _ok(json);
+    } catch (x: unknown) {
+      return _err(
+        x instanceof Error ? x : new Error("unknown error: " + String(x)),
+      );
+    }
+  }
+
+  fromJson<N, E>(json: string): Result<DiGraph<N, E>, Error> {
+    try {
+      const graph = JSON.parse(json);
+      return _ok(graph);
+    } catch (x: unknown) {
+      return _err(
+        x instanceof Error ? x : new Error("unknown error: " + String(x)),
+      );
+    }
   }
 }

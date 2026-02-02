@@ -19,3 +19,7 @@ export type Edge<T> = {
   toId: string;
   value: T;
 };
+
+export type Ok<T> = { ok: true; value: T };
+export type Err<ErrT> = { ok: false; error: ErrT };
+export type Result<T, ErrT> = Ok<T> | Err<ErrT>;
